@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        background-color: #f5f5f5;
+        color: #333;
+      }
+
+      nav {
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        color: white;
+        display: flex;
+        padding: 1.2rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      nav div {
+        margin-right: 2rem;
+        cursor: pointer;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+
+      nav div:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .tab-content {
+        padding: 2rem;
+        display: none;
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        margin-top: 2rem;
+      }
+
+      .active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+      }
+
+      h2 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 0.5rem;
+      }
+
+      input[type="number"] {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+      }
+
+      button {
+        background: #3498db;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        margin: 1rem 0;
+      }
+
+      button:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      #emiResult,
+      #loanResult {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 4px;
+        border-left: 4px solid #3498db;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      ul li {
+        padding: 1rem;
+        margin: 0.5rem 0;
+        background: #f8f9fa;
+        border-radius: 4px;
+        border-left: 4px solid #3498db;
+        transition: transform 0.2s ease;
+      }
+
+      ul li:hover {
+        transform: translateX(5px);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        nav {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        nav div {
+          margin: 0.5rem 0;
+          width: 100%;
+          text-align: center;
+        }
+
+        .tab-content {
+          margin: 1rem;
+          padding: 1rem;
+        }
+      }
+      .document-upload-container {
+        padding: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .upload-area {
+        border: 2px dashed #3498db;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .upload-area:hover {
+        background: #f8f9fa;
+        border-color: #2980b9;
+      }
+
+      .upload-prompt {
+        font-size: 1.2rem;
+        color: #2c3e50;
+      }
+
+      .upload-hint {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-top: 0.5rem;
+      }
+
+      .upload-status {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 4px;
+      }
+
+      .analysis-result {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 4px;
+        border-left: 4px solid #3498db;
+      }
+      .chat-container {
+        height: 500px;
+        display: flex;
+        flex-direction: column;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+      }
+
+      .chat-message {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border-radius: 8px;
+        max-width: 80%;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .user-message {
+        background: #3498db;
+        color: white;
+        margin-left: auto;
+      }
+
+      .bot-message {
+        background: #f5f5f5;
+        color: #333;
+      }
+
+      .chat-input-container {
+        display: flex;
+        padding: 1rem;
+        gap: 0.5rem;
+        border-top: 1px solid #eee;
+      }
+
+      .chat-input-container input {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        transition: border-color 0.3s ease;
+      }
+
+      .chat-input-container input:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+      }
+      .chat-message.bot-message#loading {
+        background: #f5f5f5;
+        color: #666;
+        font-style: italic;
+      }
+      .welcome-container {
+        padding: 2rem;
+      }
+
+      .welcome-message {
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .features-section {
+        margin-top: 3rem;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .feature-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .stats-section {
+        margin-top: 3rem;
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 12px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        text-align: center;
+      }
+
+      .stat-card {
+        padding: 1.5rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+      }
+
+      .quick-actions {
+        margin-top: 3rem;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+
+      .action-button {
+        padding: 1rem 2rem;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+
+      .action-button:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+      }
+
+      .upload-area.drag-over {
+        background: rgba(52, 152, 219, 0.1);
+        border-color: #2980b9;
+      }
+
+      .file-preview {
+        margin-top: 1rem;
+        max-width: 300px;
+        max-height: 200px;
+        object-fit: contain;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 10px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        margin-top: 1rem;
+      }
+
+      .progress {
+        height: 100%;
+        background-color: #3498db;
+        border-radius: 5px;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      .typing-animation {
+        display: inline-block;
+        animation: blink 1s infinite;
+      }
+
+      @keyframes blink {
+        50% { opacity: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div onclick="showTab('home')">Home Description</div>
+      <div onclick="showTab('emi')">EMI Calculator</div>
+      <div onclick="showTab('loan')">Loan Calculator</div>
+      <div onclick="showTab('chatbot')">AI Chatbot</div>
+      <div onclick="showTab('banking')">Banking Information</div>
+      <div onclick="showTab('documents')">Document Analysis</div>
+      <div
+        onclick="logout()"
+        style="margin-left: auto; background-color: #e74c3c"
+      >
+        Logout
+      </div>
+    </nav>
+
+    <div id="home" class="tab-content active">
+      <h2>Welcome, <span id="userName"></span>! 👋</h2>
+      <div class="welcome-container">
+        <div class="welcome-message">
+          <h3>Your Personal Financial Command Center</h3>
+          <p>
+            Access powerful financial tools and expert insights to make informed
+            decisions about your financial future.
+          </p>
+          <p>Current Market Rate: 8.5% | Best Time to Apply: Now</p>
+        </div>
+
+        <div class="stats-section">
+          <h3>Market Insights</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number">12.5%</div>
+              <div>Average ROI</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">₹2.5Cr</div>
+              <div>Loans Processed</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">15K+</div>
+              <div>Happy Customers</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">99%</div>
+              <div>Success Rate</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="features-section">
+          <h3>Premium Financial Tools</h3>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <h4>🎯 Smart EMI Calculator</h4>
+              <p>
+                Advanced algorithms to calculate optimal EMI based on your
+                income and expenses.
+              </p>
+            </div>
+            <div class="feature-card">
+              <h4>📈 Loan Advisor Pro</h4>
+              <p>
+                Get personalized loan recommendations with real-time eligibility
+                checks.
+              </p>
+            </div>
+            <div class="feature-card">
+              <h4>🤖 AI Financial Expert</h4>
+              <p>
+                24/7 access to AI-powered financial guidance and market
+                insights.
+              </p>
+            </div>
+            <div class="feature-card">
+              <h4>📊 Market Analysis</h4>
+              <p>Real-time interest rate comparisons across major banks.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <h3>Take Action Now</h3>
+          <div class="action-buttons">
+            <button class="action-button" onclick="showTab('emi')">
+              Calculate Your EMI
+            </button>
+            <button class="action-button" onclick="showTab('loan')">
+              Check Loan Options
+            </button>
+            <button class="action-button" onclick="showTab('chatbot')">
+              Get Expert Advice
+            </button>
+            <button class="action-button" onclick="showTab('documents')">
+              Upload & Analyze
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="emi" class="tab-content">
+      <h2>EMI Calculator</h2>
+      <input type="number" id="loanAmount" placeholder="Loan Amount" />
+      <input
+        type="number"
+        id="interestRate"
+        placeholder="Interest Rate (annual %)"
+      />
+      <input type="number" id="tenure" placeholder="Tenure (in years)" />
+      <button onclick="calculateEMI()">Calculate EMI</button>
+      <p id="emiResult"></p>
+    </div>
+
+    <div id="loan" class="tab-content">
+      <h2>Loan Eligibility Calculator</h2>
+      <input type="number" id="salary" placeholder="Monthly Salary" />
+      <input type="number" id="expenses" placeholder="Monthly Expenses" />
+      <input type="number" id="existingEmi" placeholder="Existing EMIs" />
+      <button onclick="calculateLoanEligibility()">Check Eligibility</button>
+      <p id="loanResult"></p>
+    </div>
+
+    <div id="chatbot" class="tab-content">
+      <h2>AI Financial Assistant</h2>
+      <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-message bot-message">
+            Hello! I'm your AI financial assistant. How can I help you today with loans, EMI, investments, or banking?
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <input
+            type="text"
+            id="chatInput"
+            placeholder="Type your financial question here..."
+            autocomplete="off"
+          />
+          <button onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="banking" class="tab-content">
+      <h2>Bank Loan Interest Rates</h2>
+      <ul>
+        <li>HDFC Bank - 8.5%</li>
+        <li>ICICI Bank - 8.7%</li>
+        <li>SBI - 8.3%</li>
+        <li>Axis Bank - 8.9%</li>
+      </ul>
+    </div>
+    <div id="documents" class="tab-content">
+      <h2>Document Analysis</h2>
+      <div class="document-upload-container">
+        <div class="upload-area" id="uploadArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+          <input
+            type="file"
+            id="fileInput"
+            accept=".pdf,.jpg,.jpeg,.png"
+            style="display: none"
+            onchange="handleFileUpload(event)"
+          />
+          <div class="upload-prompt" onclick="document.getElementById('fileInput').click()">
+            📄 Drop your financial documents here or click to upload
+            <p class="upload-hint">Supported formats: PDF, JPG, PNG</p>
+          </div>
+        </div>
+        <div id="uploadStatus" class="upload-status"></div>
+        <div id="analysisResult" class="analysis-result"></div>
+      </div>
+    </div>
+    <script>
+      function showTab(tabId) {
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((tab) => tab.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+      }
+
+      function calculateEMI() {
+        const P = parseFloat(document.getElementById("loanAmount").value);
+        const R =
+          parseFloat(document.getElementById("interestRate").value) / 12 / 100;
+        const N = parseFloat(document.getElementById("tenure").value) * 12;
+
+        const emi = (P * R * Math.pow(1 + R, N)) / (Math.pow(1 + R, N) - 1);
+        document.getElementById("emiResult").innerText =
+          "Monthly EMI: ₹" + emi.toFixed(2);
+      }
+
+      function calculateLoanEligibility() {
+        const salary = parseFloat(document.getElementById("salary").value);
+        const expenses = parseFloat(document.getElementById("expenses").value);
+        const existingEmi = parseFloat(
+          document.getElementById("existingEmi").value
+        );
+
+        const available = salary - expenses - existingEmi;
+        if (available > 10000) {
+          const maxLoan = available * 60;
+          document.getElementById("loanResult").innerText =
+            "You are eligible for a loan up to ₹" + maxLoan.toFixed(2);
+        } else {
+          document.getElementById("loanResult").innerText =
+            "You are not eligible for a loan based on provided data.";
+        }
+      }
+
+      function getCookie(name) {
+        return document.cookie
+          .split("; ")
+          .find((row) => row.startsWith(name + "="))
+          ?.split("=")[1];
+      }
+
+      const user = JSON.parse(decodeURIComponent(getCookie("user") || "{}"));
+      if (!user?.email) {
+        alert("Please login first.");
+        window.location.href = "index.html";
+      }
+
+      function logout() {
+        // Clear the user cookie
+        document.cookie =
+          "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        // Redirect to login page
+        window.location.href = "loginindex.html";
+      }
+
+      function getCookie(name) {
+        return document.cookie
+          .split("; ")
+          .find((row) => row.startsWith(name + "="))
+          ?.split("=")[1];
+      }
+
+      // Get user data and display name
+      window.onload = function () {
+        const user = JSON.parse(decodeURIComponent(getCookie("user") || "{}"));
+        if (!user?.email) {
+          window.location.href = "loginindex.html";
+        } else {
+          document.getElementById("userName").textContent = user.name;
+        }
+      };
+      
+      function addMessage(text, sender, id = null) {
+        const messages = document.getElementById("chatMessages");
+        if (!messages) return;
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `chat-message ${sender}-message`;
+        if (id) messageDiv.id = id;
+        
+        // Sanitize the text content
+        const sanitizedText = String(text).replace(/[<>]/g, '');
+        messageDiv.textContent = sanitizedText;
+        
+        messages.appendChild(messageDiv);
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      async function sendMessage() {
+        const input = document.getElementById("chatInput");
+        const message = input.value.trim();
+        
+        if (!message) return;
+
+        try {
+          // Disable input while processing
+          input.disabled = true;
+          const sendButton = document.querySelector('.chat-input-container button');
+          sendButton.disabled = true;
+
+          // Add user message
+          addMessage(message, "user");
+          input.value = "";
+
+          // Add loading message with unique ID
+          const loadingId = `loading-${Date.now()}`;
+          addMessage("Typing...", "bot", loadingId);
+
+          // Mock response for testing - use this while waiting for a valid API key
+          await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
+          
+          // Remove loading message
+          const loadingMsg = document.getElementById(loadingId);
+          if (loadingMsg) {
+            loadingMsg.remove();
+          }
+
+          // Generate a smart financial response based on keywords in the message
+          let botResponse = "I'm sorry, I couldn't process your request. Please try asking about loans, EMI, investments, or banking.";
+          
+          const lowerMsg = message.toLowerCase();
+          
+          if (lowerMsg.includes("loan")) {
+            botResponse = "For loans, we recommend comparing rates from multiple banks. Currently, SBI offers the best rate at 8.3% for home loans. Consider your credit score and income stability before applying.";
+          } else if (lowerMsg.includes("emi")) {
+            botResponse = "To reduce your EMI burden, you can either extend your loan tenure or make a larger down payment. Remember that longer tenures mean more interest paid overall.";
+          } else if (lowerMsg.includes("invest")) {
+            botResponse = "For investments, consider diversifying across fixed deposits, mutual funds, and stocks based on your risk appetite. Current FD rates range from 5.5% to 7.1% depending on the bank and tenure.";
+          } else if (lowerMsg.includes("interest") || lowerMsg.includes("rate")) {
+            botResponse = "Current interest rates vary by bank and loan type. Home loans: 8.3-8.9%, Personal loans: 10.5-14%, Car loans: 7.5-9.5%. Always negotiate for better rates based on your credit score.";
+          } else if (lowerMsg.includes("credit") || lowerMsg.includes("score")) {
+            botResponse = "A good credit score (750+) can help you secure loans at better interest rates. Pay your bills on time, keep credit utilization below 30%, and maintain a diverse credit mix to improve your score.";
+          } else if (lowerMsg.includes("saving") || lowerMsg.includes("save")) {
+            botResponse = "For effective saving, follow the 50/30/20 rule: 50% of income for necessities, 30% for wants, and 20% for savings. Set up automatic transfers to a separate high-interest savings account on payday.";
+          } else if (lowerMsg.includes("bank") || lowerMsg.includes("banking")) {
+            botResponse = "Looking at our banking partners, SBI offers the lowest home loan rates at 8.3%, while HDFC has the best digital banking experience. ICICI offers good wealth management services for premium customers.";
+          }
+          
+          addMessage(botResponse, "bot");
+
+        } catch (error) {
+          console.error("Error:", error);
+
+          // Remove any existing loading message
+          const loadingElements = document.querySelectorAll('[id^="loading-"]');
+          loadingElements.forEach(el => el.remove());
+
+          // Show error message
+          addMessage("Sorry, I couldn't process your request. Please try again.", "bot");
+
+        } finally {
+          // Re-enable input and button
+          input.disabled = false;
+          const sendButton = document.querySelector('.chat-input-container button');
+          sendButton.disabled = false;
+          input.focus();
+        }
+      }
+
+      // Add event listener for Enter key in chat input
+      document
+        .getElementById("chatInput")
+        ?.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            sendMessage();
+          }
+        });
+
+      function handleDragOver(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        document.getElementById('uploadArea').classList.add('drag-over');
+      }
+
+      function handleDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        document.getElementById('uploadArea').classList.remove('drag-over');
+        
+        const files = event.dataTransfer.files;
+        if (files.length) {
+          handleFiles(files);
+        }
+      }
+
+      function handleFileUpload(event) {
+        const files = event.target.files;
+        handleFiles(files);
+      }
+
+      function handleFiles(files) {
+        const file = files[0];
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        
+        if (!allowedTypes.includes(file.type)) {
+          showStatus('Error: Invalid file type. Please upload PDF, JPG, or PNG files.', 'error');
+          return;
+        }
+
+        showStatus('Uploading file...', 'info');
+        
+        // Create preview if it's an image
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const preview = document.createElement('img');
+            preview.src = e.target.result;
+            preview.className = 'file-preview';
+            document.getElementById('analysisResult').innerHTML = '';
+            document.getElementById('analysisResult').appendChild(preview);
+          };
+          reader.readAsDataURL(file);
+        }
+
+        // Simulate file upload with progress
+        simulateFileUploadAndAnalysis(file);
+      }
+
+      function simulateFileUploadAndAnalysis(file) {
+        // Create progress bar
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        progressBar.innerHTML = '<div class="progress"></div>';
+        document.getElementById('uploadStatus').appendChild(progressBar);
+        
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 5;
+          progressBar.querySelector('.progress').style.width = `${progress}%`;
+          
+          if (progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+              progressBar.remove();
+              showAnalysisResults(file);
+            }, 500);
+          }
+        }, 100);
+      }
+
+      function showStatus(message, type = 'info') {
+        const statusDiv = document.getElementById('uploadStatus');
+        statusDiv.innerHTML = message;
+        statusDiv.className = `upload-status ${type}`;
+      }
+
+      function showAnalysisResults(file) {
+        const analysisDiv = document.getElementById('analysisResult');
+        const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+        
+        const results = `
+          <h3>Document Analysis Results</h3>
+          <ul>
+            <li>File Name: ${file.name}</li>
+            <li>File Size: ${fileSize} MB</li>
+            <li>File Type: ${file.type}</li>
+            <li>Upload Date: ${new Date().toLocaleString()}</li>
+          </ul>
+          <div class="analysis-details">
+            <h4>Key Information Extracted:</h4>
+            <ul>
+              <li>Document Type: Financial Statement</li>
+              <li>Total Pages: 2</li>
+              <li>Status: Successfully Processed</li>
+            </ul>
+          </div>
+        `;
+        
+        analysisDiv.innerHTML += results;
+        showStatus('Document analysis completed successfully!', 'success');
+      }
+    </script>
+  </body>
+</html>
